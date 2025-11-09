@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// Call download managers with URL and destination
-	status, err := d.Download("https://platform.zone01.gr/git/root/public/src/branch/master/subjects/wget/audit", "./test")
+	status, err := d.Download("www.example.com", "./test")
 	if err != nil {
 		fmt.Println(err)
 	}

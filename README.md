@@ -119,5 +119,5 @@ Please make sure to update tests as appropriate.
 
 ## Authors
 - Vagelis Stefanopoulos
-- Katerina Vamvasaki
 - Alexis Gioldaseas
+- Katerina Vamvasaki
