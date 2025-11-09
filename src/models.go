@@ -22,7 +22,7 @@ const (
 )
 
 // This is a JSON tagged struct representing the current status of the downloader
-// Status is unique to each donwload. Its not ment for concurrent writes or reads
+// Status is unique to each donwload. Its not meant for concurrent writes or reads
 type DownloadStatus struct {
 	FileName            string     `json:"file_name"`
 	StartAt             *time.Time `json:"start_at"`
@@ -42,7 +42,7 @@ type Downloader struct {
 	StartTime             time.Time         // Global start time. Updated on very start
 	totalReadGlobal       atomic.Int64      // Total downloaded bytes
 	statuses              []*DownloadStatus // slice that holds status updates from all downloads
-	FileLogger            loggerFunc        // specilized logger to write final status on file
+	FileLogger            loggerFunc        // specialized logger to write final status on file
 	log                   loggerFunc        // function to use for logging on terminal and/or file
 	runningDownloadsCount atomic.Int32      // counter of downloads currently in progress
 	initialized           atomic.Bool
