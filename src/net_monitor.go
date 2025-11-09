@@ -71,11 +71,12 @@ func (d *Downloader) startNetReporting() {
 // Parses netStats from macOscNettop and compiles along with chunk read and total read
 func macOs(d *Downloader) {
 	go func() {
-		netStats.counter++
-
 		net := netTopMacOs()
+
 		netStats.mu.Lock()
 		defer netStats.mu.Unlock()
+
+		netStats.counter++
 
 		if netStats.first {
 			netStats.prev = 0

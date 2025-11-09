@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -58,7 +59,7 @@ func TestSingleDownload(t *testing.T) {
 	dest := filepath.Join(t.TempDir(), "file.bin")
 
 	d, warnings := NewDownloader(map[string]any{
-		"rate-limit":      int64(0),
+		"rate-limit":      0,
 		"max-downloaders": 2,
 		"no-overwrite":    true,
 	}, testLogger)
@@ -93,8 +94,8 @@ func TestConcurrentDownloads(t *testing.T) {
 	defer server.Close()
 
 	d, _ := NewDownloader(map[string]any{
-		"rate-limit":      int64(0),
-		"max-downloaders": int32(3),
+		"rate-limit":      0,
+		"max-downloaders": 3,
 		"no-overwrite":    true,
 	}, testLogger)
 
@@ -134,13 +135,13 @@ func TestRateLimiter_BasicLimit(t *testing.T) {
 	rl := rate.NewLimiter(1024, 1024) // 1 KB/s
 	start := time.Now()
 
-	// Try reading 2048 bytes; should take at least ~2 seconds
-	for i := 0; i < 2; i++ {
+	// Try reading 2048 bytes; should take at most ~2 seconds
+	for i := 0; i < 3; i++ {
 		rl.WaitN(t.Context(), 1024)
 	}
 	elapsed := time.Since(start)
 
-	if elapsed < 1800*time.Millisecond {
+	if elapsed < 2000*time.Millisecond {
 		t.Errorf("rate limiter too fast: took %v", elapsed)
 	}
 }
@@ -182,7 +183,7 @@ func TestRateLimitedReader_ReadsRespectRate(t *testing.T) {
 
 	start := time.Now()
 	_, err := io.ReadAll(rlr)
-	if err != nil {
+	if !errors.Is(err, io.EOF) {
 		t.Fatal(err)
 	}
 	elapsed := time.Since(start)
@@ -234,8 +235,8 @@ func TestNoOverwrite(t *testing.T) {
 
 func TestErrorHandling(t *testing.T) {
 	d, _ := NewDownloader(map[string]any{
-		"rate-limit":      int64(0),
-		"max-downloaders": int32(1),
+		"rate-limit":      0,
+		"max-downloaders": 1,
 		"no-overwrite":    true,
 	}, testLogger)
 
@@ -264,8 +265,8 @@ func TestContextCancel(t *testing.T) {
 	defer server.Close()
 
 	d, _ := NewDownloader(map[string]any{
-		"rate-limit":      int64(0),
-		"max-downloaders": int32(1),
+		"rate-limit":      0,
+		"max-downloaders": 1,
 	}, testLogger)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
